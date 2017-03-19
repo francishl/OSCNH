@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
+import butterknife.ButterKnife;
+
 /**
  * Created by huliang on 17/3/17.
  */
@@ -15,6 +17,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         if (initBundle(getIntent().getExtras())) {
             setContentView(getContentView());
+
+            // 绑定activity
+            ButterKnife.bind(this);
 
             // 初始化界面和数据
             initWindow();

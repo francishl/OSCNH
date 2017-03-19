@@ -10,7 +10,15 @@
     </style>
 
     <!-- 日间模式 -->
-    <style name="App.Theme.Light" parent="Base.App.Theme.Light" />
+    <style name="App.Theme.Light" parent="Base.App.Theme.Light">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Base.App.Theme.NoTitle" parent="App.Theme.Light" />
+
+    <!-- MainActivity -->
+    <style name="App.Theme.Main" parent="Base.App.Theme.NoTitle" />
 
     <style name="Base.App.Theme" parent="Base.App.Theme.Light">
         <item name="windowNoTitle">true</item>

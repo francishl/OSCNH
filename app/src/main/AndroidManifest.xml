@@ -18,7 +18,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".improve.main.MainActivity" />
+        <activity
+            android:name=".improve.main.MainActivity"
+            android:theme="@style/App.Theme.Main" />
     </application>
 
 </manifest>
