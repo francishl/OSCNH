@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <declare-styleable name="TweetPicturesLayout">
+        <!-- 必须加上format属性,否则编译失败: aapt finished with non-zero exit -->
+        <attr name="verticalSpace" format="dimension" />
+        <attr name="horizontalSpace" format="dimension" />
+        <attr name="column" format="integer" />
+        <attr name="maxPictureSize" format="integer" />
+    </declare-styleable>
+
     <declare-styleable name="TitleBar">
         <attr name="aTitle" format="string" />
         <attr name="aIcon" format="reference" />

@@ -1,5 +1,12 @@
 package com.huliang.oschn.improve.app;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
+import com.huliang.oschn.improve.app.gson.ImageJsonDeserializer;
+import com.huliang.oschn.improve.app.gson.StringJsonDeserializer;
+import com.huliang.oschn.improve.bean.Tweet;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,5 +47,23 @@ public final class AppOperator {
      */
     public static void runOnThread(Runnable runnable) {
         getExecutor().execute(runnable);
+    }
+
+    /**
+     * 创建gson对象
+     *
+     * @return
+     */
+    public static Gson createGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.setDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        JsonDeserializer deserializer = new StringJsonDeserializer();
+        gsonBuilder.registerTypeAdapter(String.class, deserializer);
+
+        deserializer = new ImageJsonDeserializer();
+        gsonBuilder.registerTypeAdapter(Tweet.Image.class, deserializer);
+
+        return gsonBuilder.create();
     }
 }

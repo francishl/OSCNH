@@ -17,6 +17,16 @@ import butterknife.ButterKnife;
 public abstract class BaseFragment extends Fragment {
 
     protected View mRoot;
+    protected Bundle mBundle;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // 用调用者传递过来的参数bundle来初始化fragment
+        mBundle = getArguments();
+        initBundle(mBundle);
+    }
 
     /**
      * 重写onCreateView决定Fragemnt的布局
@@ -63,6 +73,10 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected abstract int getLayoutId();
+
+    protected void initBundle(Bundle bundle) {
+
+    }
 
     protected void initWidget(View root) {
 
