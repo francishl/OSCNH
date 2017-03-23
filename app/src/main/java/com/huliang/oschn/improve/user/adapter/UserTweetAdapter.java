@@ -7,22 +7,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.huliang.oschn.AppContext;
 import com.huliang.oschn.R;
 import com.huliang.oschn.improve.base.adapter.BaseGeneralRecyclerAdapter;
 import com.huliang.oschn.improve.bean.Tweet;
 import com.huliang.oschn.improve.bean.simple.Author;
 import com.huliang.oschn.improve.widget.TweetPicturesLayout;
+import com.huliang.oschn.util.TLog;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
+ * 基本列表类 BaseRecyclerViewFragment, 动弹页面 adapter
+ * <p/>
  * Created by huliang on 17/3/20.
  */
-public class UserTweetAdapter extends BaseGeneralRecyclerAdapter<Tweet> {
+public class UserTweetAdapter extends BaseGeneralRecyclerAdapter<Tweet> implements View.OnClickListener {
     private static final String TAG = "UserTweetAdapter";
 
     public UserTweetAdapter(Context context) {
@@ -52,6 +57,13 @@ public class UserTweetAdapter extends BaseGeneralRecyclerAdapter<Tweet> {
                     .placeholder(R.mipmap.widget_default_face)
                     .error(R.mipmap.widget_default_face)
                     .into(holder.mViewPortrait);
+            // 点击头像
+            holder.mViewPortrait.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(AppContext.context(), "点击头像", Toast.LENGTH_SHORT).show();
+                }
+            });
             holder.mViewName.setText(author.getName());
         }
 
@@ -91,6 +103,16 @@ public class UserTweetAdapter extends BaseGeneralRecyclerAdapter<Tweet> {
         String txtCommCount = holder.mViewCmmCount.getText().toString();
         holder.mViewCmmCount.setText("0".equals(txtCommCount) ? "评论" : txtCommCount);
 
+    }
+
+    /**
+     * 点击 about 区域时触发
+     *
+     * @param v
+     */
+    @Override
+    public void onClick(View v) {
+        TLog.log("" + v.getTag());
     }
 
     /**

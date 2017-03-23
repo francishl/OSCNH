@@ -9,17 +9,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.huliang.oschn.AppContext;
 import com.huliang.oschn.R;
 import com.huliang.oschn.improve.bean.Tweet;
+import com.huliang.oschn.improve.media.ImageGalleryActivity;
+import com.huliang.oschn.util.TLog;
 
 /**
  * Created by huliang on 17/3/20.
  */
-public class TweetPicturesLayout extends ViewGroup {
+public class TweetPicturesLayout extends ViewGroup implements View.OnClickListener {
     private static final int SINGLE_MAX_W = 120;
     private static final int SINGLE_MAX_H = 180;
     private static final int SINGLE_MIN_W = 34;
@@ -61,6 +65,7 @@ public class TweetPicturesLayout extends ViewGroup {
         final Context context = getContext();
 
         final float density = getResources().getDisplayMetrics().density;
+        // 默认高和宽
         int vSpace = (int) (4 * density);
         int hSpace = vSpace;
 
@@ -124,7 +129,7 @@ public class TweetPicturesLayout extends ViewGroup {
         mImages = images;
 
         if (mImages != null && mImages.length > 0) {
-            LayoutInflater inflater = LayoutInflater.from(getContext());
+            LayoutInflater inflater = LayoutInflater.from(this.getContext());
             RequestManager requestManager = Glide.with(getContext());
 
             // 遍历images,分别加载并添加到本视图TweetPicturesLayout
@@ -137,6 +142,7 @@ public class TweetPicturesLayout extends ViewGroup {
                 // 从布局文件创建视图框架
                 View view = inflater.inflate(R.layout.lay_tweet_image_item, this, false);
                 view.setTag(i);
+                view.setOnClickListener(this);
                 String path = image.getThumb();
                 BitmapRequestBuilder builder = requestManager.load(path)
                         .asBitmap()
@@ -166,6 +172,20 @@ public class TweetPicturesLayout extends ViewGroup {
     public void removeAllImage() {
         removeAllViews();
         mImages = null;
+    }
+
+    /**
+     * 返回 mMaxPictureSize 和当前 size 中的较小者
+     *
+     * @param size
+     * @return
+     */
+    private int getMaxChildSize(int size) {
+        if (mMaxPictureSize == 0) {
+            return size;
+        } else {
+            return Math.min(mMaxPictureSize, size);
+        }
     }
 
     /**
@@ -237,7 +257,23 @@ public class TweetPicturesLayout extends ViewGroup {
                 }
             }
         } else {
+            // Measure all children
+            // 获取可显示区域的最大宽(多图情况下图片为正方形)
+            final float maxContentWidth = selfWidth - paddingLeft - paddingRight -
+                    mHorizontalSpacing * (mColumn - 1);
+            // Get child size
+            // 每张图片的最大边长
+            final int childSize = getMaxChildSize((int) (maxContentWidth / mColumn));
 
+            for (int i = 0; i < childCount; i++) {
+                View childView = getChildAt(i);
+                // makeMeasureSpec: 根据提供的大小值和模式创建一个测量值
+                childView.measure(
+                        MeasureSpec.makeMeasureSpec(childSize, MeasureSpec.EXACTLY),
+                        MeasureSpec.makeMeasureSpec(childSize, MeasureSpec.EXACTLY));
+            }
+
+            wantedHeight += childSize;
         }
 
         // 传递View的高度和宽度到setMeasuredDimension方法,告诉父控件需要多大地方放置子控件
@@ -257,7 +293,57 @@ public class TweetPicturesLayout extends ViewGroup {
                 int childHeight = childView.getMeasuredHeight();
                 childView.layout(paddingLeft, paddingTop, paddingLeft + childWidth,
                         paddingTop + childHeight);
+            } else {
+                // 多图模式, 初始化"原点"坐标
+                int childLeft = paddingLeft;
+                int childTop = paddingTop;
+
+                for (int i = 0; i < childCount; i++) {
+                    View childView = getChildAt(i);
+                    int childWidth = childView.getMeasuredWidth();
+                    int childHeight = childView.getMeasuredHeight();
+                    childView.layout(childLeft, childTop, childLeft + childWidth,
+                            childTop + childHeight);
+
+                    // 更新下一张图片的起点坐标
+                    childLeft += childWidth + mHorizontalSpacing;
+                }
             }
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        Tweet.Image[] images = mImages;
+        if (images == null || images.length <= 0) {
+            return;
+        }
+
+        Object obj = v.getTag();
+        if (obj == null || !(obj instanceof Integer)) {
+            return;
+        }
+
+        // 被点击图片的位置
+        int index = (int) obj;
+        if (index < 0) {
+            index = 0;
+        } else if (index >= images.length) {
+            index = images.length - 1;
+        }
+
+        // 被点击图片
+        Tweet.Image image = images[index];
+        if (!Tweet.Image.check(image)) {
+            return;
+        }
+
+        // 图片列表的urls
+        String[] paths = Tweet.Image.getImagePaths(images);
+        if (paths == null || paths.length == 0) {
+            return;
+        }
+
+        ImageGalleryActivity.show(getContext(), paths, index);
     }
 }

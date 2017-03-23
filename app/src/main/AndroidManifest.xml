@@ -24,6 +24,8 @@
         <activity
             android:name=".improve.main.MainActivity"
             android:theme="@style/App.Theme.Main" />
+
+        <activity android:name=".improve.media.ImageGalleryActivity" />
     </application>
 
 </manifest>

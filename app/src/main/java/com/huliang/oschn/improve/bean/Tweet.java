@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.huliang.oschn.improve.bean.simple.Author;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by huliang on 17/3/19.
@@ -199,6 +201,25 @@ public class Tweet implements Serializable {
         public static boolean check(Image image) {
             return (image != null && !TextUtils.isEmpty(image.getThumb())
                     && !TextUtils.isEmpty(image.getHref()));
+        }
+
+        /**
+         * 获取图片列表的urls
+         *
+         * @param images
+         * @return
+         */
+        public static String[] getImagePaths(Image[] images) {
+            if (images == null || images.length == 0) {
+                return null;
+            }
+            List<String> paths = new ArrayList<>();
+            for (Image image : images) {
+                if (check(image)) {
+                    paths.add(image.getHref());
+                }
+            }
+            return paths.toArray(new String[paths.size()]);
         }
     }
 }

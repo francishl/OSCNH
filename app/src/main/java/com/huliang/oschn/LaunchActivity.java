@@ -22,7 +22,7 @@ public class LaunchActivity extends BaseActivity {
     protected void initData() {
         super.initData();
 
-        // 在这里我们检测是否是新版本安装，如果是则进行老版本数据迁移工作
+        // 在这里我们检测是否是新版本安装，如果是则进行老版本数据的迁移工作
         // 该工作可能消耗大量时间所以放在自线程中执行
         AppOperator.runOnThread(new Runnable() {
             @Override
