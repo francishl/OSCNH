@@ -15,6 +15,11 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+
+        // 配置maven仓库地址
+        maven {
+            url 'https://dl.bintray.com/oschinaapp/maven/'
+        }
     }
 }
 

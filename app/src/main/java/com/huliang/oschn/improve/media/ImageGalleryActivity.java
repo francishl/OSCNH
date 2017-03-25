@@ -21,7 +21,8 @@ import com.huliang.oschn.AppContext;
 import com.huliang.oschn.R;
 import com.huliang.oschn.improve.app.AppOperator;
 import com.huliang.oschn.improve.base.activities.BaseActivity;
-import com.huliang.oschn.util.TLog;
+
+import net.oschina.common.widget.Loading;
 
 import butterknife.OnClick;
 
@@ -97,6 +98,7 @@ public class ImageGalleryActivity extends BaseActivity implements ViewPager.OnPa
 
         mImagePager = (PreviewerViewPager) findViewById(R.id.vp_image);
         mIndexText = (TextView) findViewById(R.id.tv_index);
+        mImagePager.addOnPageChangeListener(this);
     }
 
     @Override
@@ -197,13 +199,13 @@ public class ImageGalleryActivity extends BaseActivity implements ViewPager.OnPa
                     R.layout.lay_gallery_page_item_container, container, false);
             ImagePreviewView previewView = (ImagePreviewView) view.findViewById(R.id.iv_preview);
             ImageView defaultView = (ImageView) view.findViewById(R.id.iv_default);
-//            Loading loading = (Loading) view.findViewById(R.id.loading);
+            Loading loading = (Loading) view.findViewById(R.id.loading);
 
             // 加载图片
             if (mNeedCookie) {
 
             } else {
-                loadImage(position, mImageSources[position], previewView, defaultView, null);
+                loadImage(position, mImageSources[position], previewView, defaultView, loading);
             }
 
             previewView.setOnClickListener(getListener());
@@ -250,14 +252,21 @@ public class ImageGalleryActivity extends BaseActivity implements ViewPager.OnPa
             loadImageDoDownAndGetOverrideSize(urlOrPath, new DoOverrideSizeCallback() {
                 @Override
                 public void onDone(int overrideW, int overrideH, boolean isTrue) {
-                    TLog.log("--------- 下载图片");
+                    // Glide 加载图片
                     DrawableRequestBuilder builder = getImageLoader().load(urlOrPath)
+                            // 监听图片加载动作
                             .listener(new RequestListener<T, GlideDrawable>() {
                                 @Override
                                 public boolean onException(Exception e,
                                                            T model,
                                                            Target<GlideDrawable> target,
                                                            boolean isFirstResource) {
+                                    if (e != null) {
+                                        e.printStackTrace();
+                                    }
+
+                                    loading.stop();
+                                    loading.setVisibility(View.GONE);
                                     defaultView.setVisibility(View.VISIBLE);
                                     updateDownloadStatus(pos, false);
                                     return false;
@@ -269,10 +278,12 @@ public class ImageGalleryActivity extends BaseActivity implements ViewPager.OnPa
                                                                Target<GlideDrawable> target,
                                                                boolean isFromMemoryCache,
                                                                boolean isFirstResource) {
+                                    loading.stop();
+                                    loading.setVisibility(View.GONE);
                                     updateDownloadStatus(pos, true);
                                     return false;
                                 }
-                            }).diskCacheStrategy(DiskCacheStrategy.SOURCE);
+                            }).diskCacheStrategy(DiskCacheStrategy.SOURCE); // 图片缓存策略
 
                     builder.into(previewView);
                 }
@@ -298,10 +309,6 @@ public class ImageGalleryActivity extends BaseActivity implements ViewPager.OnPa
                     });
                 }
             });
-        }
-
-        private class Loading {
-
         }
     }
 

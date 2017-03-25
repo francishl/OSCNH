@@ -273,7 +273,9 @@ public class TweetPicturesLayout extends ViewGroup implements View.OnClickListen
                         MeasureSpec.makeMeasureSpec(childSize, MeasureSpec.EXACTLY));
             }
 
-            wantedHeight += childSize;
+            // 图片矩阵的行数
+            int lines = (int) Math.ceil(childCount / (float) mColumn);
+            wantedHeight += childSize * lines + mVerticalSpacing * (lines - 1);
         }
 
         // 传递View的高度和宽度到setMeasuredDimension方法,告诉父控件需要多大地方放置子控件

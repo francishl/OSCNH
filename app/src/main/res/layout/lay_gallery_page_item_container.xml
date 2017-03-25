@@ -12,14 +12,14 @@
         android:layout_height="match_parent"
         android:layout_gravity="center" />
 
-    <!--<net.oschina.common.widget.Loading-->
-        <!--android:id="@+id/loading"-->
-        <!--android:layout_width="@dimen/size_32"-->
-        <!--android:layout_height="@dimen/size_32"-->
-        <!--android:layout_gravity="center"-->
-        <!--app:gBackgroundColor="@color/white_alpha_16"-->
-        <!--app:gForegroundColor="@color/white_alpha_240"-->
-        <!--app:gForegroundLineSize="1dp" />-->
+    <net.oschina.common.widget.Loading
+        android:id="@+id/loading"
+        android:layout_width="@dimen/size_32"
+        android:layout_height="@dimen/size_32"
+        android:layout_gravity="center"
+        app:gBackgroundColor="@color/white_alpha_16"
+        app:gForegroundColor="@color/white_alpha_240"
+        app:gForegroundLineSize="1dp" />
 
     <ImageView
         android:id="@+id/iv_default"

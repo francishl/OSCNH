@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.huliang.oschn">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,7 +11,12 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/App.Theme.Light">
+        android:theme="@style/App.Theme.Light"
+        tools:replace="android:allowBackup">
+        <!--AS的Gradle插件默认会启用Manifest Merger Tool，若Library项目中也定义了与主项目相同的属性-->
+        <!--（例如默认生成的Android:icon和android:theme），则此时会合并失败，并报上面的错误。-->
+        <!--在Manifest.xml的application标签下添加tools:replace="android:icon, android:theme"-->
+        <!--（多个属性用,隔开)-->
         <activity
             android:name=".LaunchActivity"
             android:theme="@style/App.Theme.Launch">

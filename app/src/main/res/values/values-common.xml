@@ -1,38 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <array name="g_default_loading_fg">
-        <item>#00bcd4</item>
-        <item>#9c27b0</item>
-        <item>#5677fc</item>
-        <item>#ff9800</item>
-        <item>#e91e63</item>
-    </array>
-
-    <declare-styleable name="AdjustTextView">
-        <attr name="oscMinTextSize" format="dimension" />
-    </declare-styleable>
-    <declare-styleable name="FlowLayout">
-        <attr name="oscVerticalSpace" format="dimension" />
-        <attr name="oscHorizontalSpace" format="dimension" />
-    </declare-styleable>
-    <declare-styleable name="Loading">
-        <attr name="gBackgroundLineSize" format="dimension" />
-        <attr name="gForegroundLineSize" format="dimension" />
-        <attr name="gBackgroundColor" format="reference|color" />
-        <attr name="gForegroundColor" format="reference|color" />
-        <attr name="gAutoRun" format="boolean" />
-        <attr name="gProgressFloat" format="float" />
-    </declare-styleable>
-    <declare-styleable name="SquareLayout">
-        <attr name="oscAccordTo" format="integer">
-            <enum name="width" value="1" />
-            <enum name="height" value="2" />
-            <enum name="useMin" value="3" />
-        </attr>
-    </declare-styleable>
-    <dimen name="g_loading_maxSize">40dp</dimen>
-    <dimen name="g_loading_minSize">28dp</dimen>
-
-
 </resources>
