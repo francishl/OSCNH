@@ -2,7 +2,6 @@ package com.huliang.oschn.improve.base.fragments;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import com.huliang.oschn.R;
@@ -19,7 +18,7 @@ import java.lang.reflect.Type;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * 基本列表类，重写getLayoutId()自定义界面
+ * 基本列表类 RecyclerView，重写getLayoutId()自定义界面
  * <p/>
  * Created by huliang on 17/3/19.
  */
@@ -33,7 +32,7 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
 
     protected TextHttpResponseHandler mHandler;
     protected boolean isRefreshing;
-    protected PageBean<T> mBean;
+    protected PageBean<T> mBean; // 页面bean, 用来控制翻页
 
     @Override
     protected int getLayoutId() {
@@ -53,6 +52,7 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
         mBean = new PageBean<>();
 
         mAdapter = getRecyclerAdapter();
+        mAdapter.setState(BaseRecyclerAdapter.STATE_HIDE, false);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -68,11 +68,7 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
-                TLog.log(responseString.substring(0, 500));
-                TLog.log(responseString.substring(500, 1000));
-                TLog.log(responseString.substring(1500, 2000));
-                TLog.log(responseString.substring(responseString.length() - 500,
-                        responseString.length()));
+                TLog.log(responseString);
                 try {
                     ResultBean<PageBean<T>> resultBean = AppOperator.createGson().fromJson(
                             responseString, getType());
@@ -96,11 +92,14 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
     @Override
     public void onRefreshing() {
         isRefreshing = true;
+        mAdapter.setState(BaseRecyclerAdapter.STATE_HIDE, true); // adapter加载状态
         requestData();
     }
 
     @Override
     public void onLoadMore() {
+        mAdapter.setState(isRefreshing ? BaseRecyclerAdapter.STATE_HIDE :
+                BaseRecyclerAdapter.STATE_LOADING, true); // adapter加载状态
         requestData();
     }
 
@@ -122,11 +121,18 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
     protected void setListData(ResultBean<PageBean<T>> resultBean) {
         mBean.setNextPageToken(resultBean.getResult().getNextPageToken());
         if (isRefreshing) {
-            Log.i(TAG, "isRefreshing: " + isRefreshing);
-            mAdapter.addAll(resultBean.getResult().getItems());
+            mAdapter.clear(); // 清空数据
+            mBean.setItems(resultBean.getResult().getItems());
+            mAdapter.addAll(mBean.getItems());
+            mRefreshLayout.setCanLoadMore(true);
         } else {
-            Log.i(TAG, "isRefreshing: " + isRefreshing);
             mAdapter.addAll(resultBean.getResult().getItems());
+        }
+
+        // 如果没有Item或个数小于20, 则表示数据加载完毕
+        if (resultBean.getResult().getItems() == null ||
+                resultBean.getResult().getItems().size() < 20) {
+            mAdapter.setState(BaseRecyclerAdapter.STATE_NO_MORE, true);
         }
     }
 

@@ -15,7 +15,7 @@ import java.lang.reflect.Type;
 
 /**
  * 动弹 recyclerView
- * <p>
+ * <p/>
  * Created by huliang on 17/3/19.
  */
 public class TweetFragment extends BaseGeneralRecyclerFragment<Tweet> {
@@ -45,7 +45,7 @@ public class TweetFragment extends BaseGeneralRecyclerFragment<Tweet> {
     protected void requestData() {
         super.requestData();
 
-        String pageToken = isRefreshing ? null : null;
+        String pageToken = isRefreshing ? null : mBean.getNextPageToken();
         switch (mReqCatalog) {
             case CATALOG_NEW:
                 OSChinaApi.getTweetList(null, null, 1, 1, pageToken, mHandler);

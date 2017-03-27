@@ -296,6 +296,10 @@ public class TweetPicturesLayout extends ViewGroup implements View.OnClickListen
                 childView.layout(paddingLeft, paddingTop, paddingLeft + childWidth,
                         paddingTop + childHeight);
             } else {
+                int parentWidth = r - l; // 父控件的宽度(right - left)
+                int paddingRight = getPaddingRight();
+                int lineHeight = 0; // 每一行的高度
+
                 // 多图模式, 初始化"原点"坐标
                 int childLeft = paddingLeft;
                 int childTop = paddingTop;
@@ -304,6 +308,14 @@ public class TweetPicturesLayout extends ViewGroup implements View.OnClickListen
                     View childView = getChildAt(i);
                     int childWidth = childView.getMeasuredWidth();
                     int childHeight = childView.getMeasuredHeight();
+
+                    // 如果当前图片位置超出父控件的宽度,则另一起行
+                    if (childLeft + childWidth + paddingRight > parentWidth) {
+                        // 重新初始化各个坐标
+                        childLeft = paddingLeft;
+                        childTop += childHeight + mVerticalSpacing;
+                    }
+
                     childView.layout(childLeft, childTop, childLeft + childWidth,
                             childTop + childHeight);
 
