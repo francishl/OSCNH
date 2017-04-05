@@ -1,8 +1,8 @@
 package com.huliang.oschn.improve.base.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * RecyclerView.Adapter 基类
- * <p/>
+ * <p>
  * Created by huliang on 17/3/20.
  */
 public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
@@ -28,6 +28,11 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
 
     public final int BEHAVIOR_MODE;
     protected int mState;
+
+    private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
+    private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
 
     // 加载状态
     public static final int STATE_NO_MORE = 1;
@@ -54,6 +59,33 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
         mInflater = LayoutInflater.from(context);
         BEHAVIOR_MODE = mode;
         mState = STATE_HIDE;
+        initListener();
+    }
+
+    /**
+     * 初始化 listener, 监听点击和点长击事件,
+     * 并传递给自定义 OnItemClickListener 和 OnItemLongClickListener
+     */
+    private void initListener() {
+        onClickListener = new OnClickListener() {
+            @Override
+            public void onClick(int position, long itemId) {
+                if (onItemClickListener != null) {
+                    onItemClickListener.onItemClick(position, itemId);
+                }
+            }
+        };
+
+        onLongClickListener = new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(int position, long itemId) {
+                if (onItemLongClickListener != null) {
+                    onItemLongClickListener.onItemLongClick(position, itemId);
+                    return true;
+                }
+                return false;
+            }
+        };
     }
 
     /**
@@ -65,12 +97,17 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.i(TAG, "adapter item的类型: " + viewType);
         switch (viewType) {
             case VIEW_TYPE_FOOTER:
                 return new FooterViewHolder(mInflater.inflate(R.layout.recycler_footer_view, parent, false));
             default:
                 final RecyclerView.ViewHolder holder = onCreateDefaultViewHolder(parent, viewType);
+                if (holder != null) {
+                    // 对 viewHolder 添加事件监听
+                    holder.itemView.setTag(holder);
+                    holder.itemView.setOnClickListener(onClickListener);
+                    holder.itemView.setOnLongClickListener(onLongClickListener);
+                }
                 return holder;
         }
     }
@@ -91,6 +128,10 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
                     case STATE_LOADING:
                         footHolder.tv_footer.setText(mContext.getResources().getString(R.string.state_loading));
                         footHolder.pb_footer.setVisibility(View.VISIBLE);
+                        break;
+                    case STATE_NO_MORE:
+                        footHolder.tv_footer.setText(R.string.state_not_more);
+                        footHolder.pb_footer.setVisibility(View.GONE);
                         break;
                     case STATE_HIDE:
                         footHolder.itemView.setVisibility(View.GONE);
@@ -151,6 +192,15 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
         }
     }
 
+    /**
+     * 头部尾部之外的数据 count
+     *
+     * @return
+     */
+    public int getCount() {
+        return mItems.size();
+    }
+
     public void addAll(List<T> items) {
         if (items != null) {
             mItems.addAll(items);
@@ -164,6 +214,14 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
             // notifyItemChanged(int position): 在位置position上的item发生变化
             notifyItemChanged(mItems.size());
         }
+    }
+
+    public final T getItem(int position) {
+        int p = getIndex(position);
+        if (p < 0 || p >= mItems.size()) {
+            return null;
+        }
+        return mItems.get(p);
     }
 
     public final void clear() {
@@ -182,12 +240,23 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
         return mState;
     }
 
-    public void updateItem(int position) {
+    public void updateItem(final int position) {
         if (position < getItemCount()) {
             // 在位置position上的item发生变化
-            notifyItemChanged(position);
+//            notifyItemChanged(position);
+
+            // 当recyclerView正在计算layout的时候，任何试图更新adapter内容的操作都会导致异常。
+            // 而当view在layout正在计算过程中的一些回调，我们可以通过handler或者其他类似机制延后这些改变
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    notifyItemChanged(position);
+                }
+            });
         }
     }
+
+    Handler handler = new Handler();
 
     /**
      * Footer view
@@ -201,5 +270,69 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter {
             pb_footer = (ProgressBar) itemView.findViewById(R.id.pb_footer);
             tv_footer = (TextView) itemView.findViewById(R.id.tv_footer);
         }
+    }
+
+    /**
+     * 添加 item 点击事件
+     *
+     * @param onItemClickListener
+     */
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    /**
+     * 添加 item 点长击事件
+     *
+     * @param onItemLongClickListener
+     */
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
+    /**
+     * recyclerAdapter item 点击监听
+     */
+    public interface OnItemClickListener {
+        void onItemClick(int position, long itemId);
+    }
+
+    /**
+     * recyclerAdapter item 长按监听
+     */
+    public interface OnItemLongClickListener {
+        void onItemLongClick(int position, long itemId);
+    }
+
+    /**
+     * 子类来实现, 传递点击操作
+     * 可以共用同一个listener，相对高效
+     */
+    public static abstract class OnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            // 获取点击 item
+            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) v.getTag();
+            // 传递动作事件
+            onClick(holder.getAdapterPosition(), holder.getItemId());
+        }
+
+        public abstract void onClick(int position, long itemId);
+    }
+
+    /**
+     * 子类来实现, 传递点长击操作
+     * 可以共用同一个listener，相对高效
+     */
+    public static abstract class OnLongClickListener implements View.OnLongClickListener {
+        @Override
+        public boolean onLongClick(View v) {
+            // 获取点击 item
+            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) v.getTag();
+            // 传递动作事件
+            return onLongClick(holder.getAdapterPosition(), holder.getItemId());
+        }
+
+        public abstract boolean onLongClick(int position, long itemId);
     }
 }

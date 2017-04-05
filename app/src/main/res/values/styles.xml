@@ -1,4 +1,11 @@
 <resources>
 
+    <style name="user_face_image">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:padding">1dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:src">@mipmap/widget_default_face</item>
+    </style>
 
 </resources>

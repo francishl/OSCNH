@@ -3,6 +3,7 @@ package com.huliang.oschn.api;
 import android.annotation.SuppressLint;
 import android.app.Application;
 
+import com.huliang.oschn.util.TLog;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -44,6 +45,7 @@ public class ApiHttpClient {
     public static void get(String partUrl, RequestParams params,
                            AsyncHttpResponseHandler handler) {
         CLIENT.get(getAbsoluteApiUrl(partUrl), params, handler);
+        log("GET " + partUrl + "?" + params);
     }
 
     public static void setHttpClient(AsyncHttpClient c, Application application) {
@@ -57,6 +59,10 @@ public class ApiHttpClient {
             url = String.format(API_URL, partUrl);
         }
         return url;
+    }
+
+    public static void log(String log) {
+        TLog.log("ApiHttpClient", log);
     }
 
     /**

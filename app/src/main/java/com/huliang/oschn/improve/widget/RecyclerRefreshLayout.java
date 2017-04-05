@@ -5,7 +5,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 /**
@@ -45,7 +44,6 @@ public class RecyclerRefreshLayout extends SwipeRefreshLayout implements
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        Log.i(TAG, "onLayout: -------- " + left + " " + top + " " + right + " " + bottom);
         if (mRecycleView == null) {
             getRecycleView();
         }

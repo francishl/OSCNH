@@ -13,7 +13,7 @@ public class OSCApplication extends AppContext {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "onCreate: 创建");
+        Log.i(TAG, "onCreate ---- 创建");
         init();
     }
 

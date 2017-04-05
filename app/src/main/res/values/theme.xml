@@ -7,6 +7,14 @@
         <item name="colorPrimary">@color/day_colorPrimary</item>
         <item name="colorPrimaryDark">@color/day_colorPrimaryDark</item>
         <item name="colorAccent">@color/day_colorPrimary</item>
+
+        <!--text style-->
+        <item name="infoTextColor">@color/day_infoTextColor</item>
+        <item name="textColor">@color/day_textColor</item>
+
+        <!--toolbar style-->
+        <item name="actionBarSize">48dp</item>
+        <item name="toolbarStyle">@style/App.Widget.Light.Toolbar</item>
     </style>
 
     <!-- 日间模式 -->
@@ -15,7 +23,29 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Base.App.Theme.NoTitle" parent="App.Theme.Light" />
+    <!-- toolbar -->
+    <style name="Base.App.Widget.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:height">?attr/actionBarSize</item>
+        <item name="titleTextAppearance">@style/App.TextAppearance.Widget.Toolbar.Title</item>
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetStartWithNavigation">0dp</item>
+        <item name="titleMargin">0dp</item>
+    </style>
+
+    <style name="App.Widget.Light.Toolbar" parent="Base.App.Widget.Toolbar">
+        <item name="navigationIcon">@drawable/selector_nav_back_light</item>
+    </style>
+
+    <!--text appearance-->
+    <style name="App.TextAppearance.Widget.Toolbar.Title" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Base.App.Theme.NoTitle" parent="App.Theme.Light">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
 
     <!-- MainActivity -->
     <style name="App.Theme.Main" parent="Base.App.Theme.NoTitle" />

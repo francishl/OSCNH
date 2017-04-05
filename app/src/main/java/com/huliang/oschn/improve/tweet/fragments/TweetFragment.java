@@ -9,16 +9,19 @@ import com.huliang.oschn.improve.base.fragments.BaseGeneralRecyclerFragment;
 import com.huliang.oschn.improve.bean.Tweet;
 import com.huliang.oschn.improve.bean.base.PageBean;
 import com.huliang.oschn.improve.bean.base.ResultBean;
+import com.huliang.oschn.improve.tweet.activities.TweetDetailActivity;
 import com.huliang.oschn.improve.user.adapter.UserTweetAdapter;
+import com.huliang.oschn.util.TLog;
 
 import java.lang.reflect.Type;
 
 /**
  * 动弹 recyclerView
- * <p/>
+ * <p>
  * Created by huliang on 17/3/19.
  */
-public class TweetFragment extends BaseGeneralRecyclerFragment<Tweet> {
+public class TweetFragment extends BaseGeneralRecyclerFragment<Tweet> implements
+        BaseRecyclerAdapter.OnItemLongClickListener {
     private static final String TAG = "TweetFragment";
 
     public int mReqCatalog; //请求类型
@@ -42,6 +45,12 @@ public class TweetFragment extends BaseGeneralRecyclerFragment<Tweet> {
     }
 
     @Override
+    protected void initData() {
+        super.initData();
+        mAdapter.setOnItemLongClickListener(this);
+    }
+
+    @Override
     protected void requestData() {
         super.requestData();
 
@@ -55,6 +64,25 @@ public class TweetFragment extends BaseGeneralRecyclerFragment<Tweet> {
                 OSChinaApi.getTweetList(null, null, 1, 2, pageToken, mHandler);
                 break;
         }
+    }
+
+    @Override
+    protected boolean isNeedEmptyView() {
+        return mReqCatalog != CATALOG_TAG && mReqCatalog != CATALOG_SOMEONE;
+    }
+
+    @Override
+    public void onItemClick(int position, long itemId) {
+        Tweet tweet = mAdapter.getItem(position);
+        if (tweet == null) {
+            return;
+        }
+        TweetDetailActivity.show(getContext(), tweet);
+    }
+
+    @Override
+    public void onItemLongClick(int position, long itemId) {
+        TLog.log("=========");
     }
 
     @Override

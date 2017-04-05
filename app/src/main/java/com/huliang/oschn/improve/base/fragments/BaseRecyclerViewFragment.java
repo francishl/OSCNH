@@ -10,6 +10,7 @@ import com.huliang.oschn.improve.base.adapter.BaseRecyclerAdapter;
 import com.huliang.oschn.improve.bean.base.PageBean;
 import com.huliang.oschn.improve.bean.base.ResultBean;
 import com.huliang.oschn.improve.widget.RecyclerRefreshLayout;
+import com.huliang.oschn.ui.empty.EmptyLayout;
 import com.huliang.oschn.util.TLog;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -19,16 +20,18 @@ import cz.msebera.android.httpclient.Header;
 
 /**
  * 基本列表类 RecyclerView，重写getLayoutId()自定义界面
- * <p/>
+ * <p>
  * Created by huliang on 17/3/19.
  */
 public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implements
-        RecyclerRefreshLayout.SuperRefreshLayoutListener {
+        RecyclerRefreshLayout.SuperRefreshLayoutListener,
+        BaseRecyclerAdapter.OnItemClickListener {
     private static final String TAG = "BaseRecyclerView";
 
     protected BaseRecyclerAdapter<T> mAdapter;
     protected RecyclerView mRecyclerView;
     protected RecyclerRefreshLayout mRefreshLayout;
+    protected EmptyLayout mErrorLayout;
 
     protected TextHttpResponseHandler mHandler;
     protected boolean isRefreshing;
@@ -44,6 +47,7 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
         super.initWidget(root);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.recyclerView);
         mRefreshLayout = (RecyclerRefreshLayout) root.findViewById(R.id.refreshLayout);
+        mErrorLayout = (EmptyLayout) root.findViewById(R.id.error_layout);
     }
 
     @Override
@@ -53,6 +57,7 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
 
         mAdapter = getRecyclerAdapter();
         mAdapter.setState(BaseRecyclerAdapter.STATE_HIDE, false);
+        mAdapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -74,6 +79,7 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
                             responseString, getType());
                     if (resultBean != null && resultBean.isSuccess() && resultBean.getResult().getItems() != null) {
                         setListData(resultBean);
+                        onRequestSuccess(resultBean.getCode());
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -87,6 +93,26 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
                 onRequestFinish();
             }
         };
+
+        // 空页面, 首先加载本地缓存; 本地缓存为空, 则加载网络数据
+        if (isNeedEmptyView()) {
+            // frameLayout -- mErrorLayout 和 mRefreshLayout 二者只有一个可见
+            mErrorLayout.setErrorType(EmptyLayout.NETWORK_LOADING);
+            mRefreshLayout.setVisibility(View.GONE);
+
+            mErrorLayout.setErrorType(EmptyLayout.HIDE_LAYOUT);
+            mRefreshLayout.setVisibility(View.VISIBLE);
+            // 添加一条任务到 UI 线程, 即将执行
+            mRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    mRefreshLayout.setRefreshing(true); // 下拉刷新动画
+                    onRefreshing(); // 加载网络数据
+                }
+            });
+        } else {
+
+        }
     }
 
     @Override
@@ -134,6 +160,12 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
                 resultBean.getResult().getItems().size() < 20) {
             mAdapter.setState(BaseRecyclerAdapter.STATE_NO_MORE, true);
         }
+
+        // 如果数据大于0, 则隐藏 errorLayout
+        if (mAdapter.getItems().size() > 0) {
+            mErrorLayout.setErrorType(EmptyLayout.HIDE_LAYOUT);
+            mRefreshLayout.setVisibility(View.VISIBLE);
+        }
     }
 
     /**
@@ -141,6 +173,24 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
      */
     protected void requestData() {
 
+    }
+
+    /**
+     * 网络加载成功
+     *
+     * @param code
+     */
+    protected void onRequestSuccess(int code) {
+
+    }
+
+    /**
+     * 需要空的View
+     *
+     * @return
+     */
+    protected boolean isNeedEmptyView() {
+        return true;
     }
 
     /**
@@ -156,4 +206,9 @@ public abstract class BaseRecyclerViewFragment<T> extends BaseFragment implement
      * @return
      */
     protected abstract Type getType();
+
+    @Override
+    public void onItemClick(int position, long itemId) {
+
+    }
 }

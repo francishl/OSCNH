@@ -35,4 +35,29 @@ public class OSChinaApi {
         params.put("pageToken", pageToken);
         ApiHttpClient.get("action/apiv2/tweet_list", params, handler);
     }
+
+    /**
+     * 请求动弹详情
+     *
+     * @param id      动弹id
+     * @param handler
+     */
+    public static void getTweetDetail(long id, TextHttpResponseHandler handler) {
+        RequestParams params = new RequestParams();
+        params.put("id", id);
+        ApiHttpClient.get("action/apiv2/tweet", params, handler);
+    }
+
+    /**
+     * 请求动弹点赞列表
+     *
+     * @param sourceId 动弹id
+     * @param handler  回调
+     */
+    public static void getTweetLikeList(long sourceId, String pageToken, TextHttpResponseHandler handler) {
+        RequestParams params = new RequestParams();
+        params.put("sourceId", sourceId);
+        params.put("pageToken", pageToken);
+        ApiHttpClient.get("action/apiv2/tweet_likes", params, handler);
+    }
 }

@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:background="@drawable/ic_material"
         android:orientation="horizontal"
         android:paddingBottom="@dimen/lay_12"
         android:paddingLeft="@dimen/lay_16"
