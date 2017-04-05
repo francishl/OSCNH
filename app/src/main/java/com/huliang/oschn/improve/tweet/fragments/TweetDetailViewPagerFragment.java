@@ -63,7 +63,7 @@ public class TweetDetailViewPagerFragment extends Fragment implements
             mLikeFragment = ListTweetLikeUsersFragment.instantiate(mOperator, this);
 
             final ListTweetCommentFragment mCommentFragment;
-            mCommentFragment = new ListTweetCommentFragment();
+            mCommentFragment = ListTweetCommentFragment.instantiate(mOperator, this);
 
             mAdapter = new FragmentStatePagerAdapter(getChildFragmentManager()) {
                 @Override
@@ -116,7 +116,14 @@ public class TweetDetailViewPagerFragment extends Fragment implements
 
     @Override
     public void resetCmnCount(int count) {
-
+        TLog.log("评论数更新 " + count);
+        // 重置数据 count
+        mOperator.getTweetDetail().setCommentCount(count);
+        // 刷新界面
+        TabLayout.Tab tab = mTabLayout.getTabAt(1);
+        if (tab != null) {
+            tab.setText(String.format("评论(%s)", count));
+        }
     }
 
     @Override

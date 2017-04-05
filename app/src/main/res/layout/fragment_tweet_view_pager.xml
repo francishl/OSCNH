@@ -11,9 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="#F6F6F6"
-        app:tabBackground="@drawable/ic_material"
         app:tabGravity="fill"
-        app:tabIndicatorHeight="0dp"
+        app:tabIndicatorColor="#00000000"
         app:tabMode="fixed"
         app:tabSelectedTextColor="?attr/colorPrimary"
         app:tabTextColor="#6A6A6A" />

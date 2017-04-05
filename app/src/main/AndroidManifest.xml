@@ -32,6 +32,7 @@
             android:theme="@style/App.Theme.Main" />
 
         <activity android:name=".improve.media.ImageGalleryActivity" />
+
         <activity
             android:name=".improve.tweet.activities.TweetDetailActivity"
             android:theme="@style/Base.App.Theme.NoTitle" />

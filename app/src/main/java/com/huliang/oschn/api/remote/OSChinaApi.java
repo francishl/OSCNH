@@ -49,6 +49,19 @@ public class OSChinaApi {
     }
 
     /**
+     * 请求动弹评论列表
+     *
+     * @param sourceId 动弹id
+     * @param handler  回调
+     */
+    public static void getTweetCommentList(long sourceId, String pageToken, TextHttpResponseHandler handler) {
+        RequestParams params = new RequestParams();
+        params.put("sourceId", sourceId);
+        params.put("pageToken", pageToken);
+        ApiHttpClient.get("action/apiv2/tweet_comments", params, handler);
+    }
+
+    /**
      * 请求动弹点赞列表
      *
      * @param sourceId 动弹id

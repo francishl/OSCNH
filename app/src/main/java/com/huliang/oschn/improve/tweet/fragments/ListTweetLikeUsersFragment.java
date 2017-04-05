@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 
 /**
  * 动弹详情, 点赞列表 recyclerView
- * <p>
+ * <p/>
  * Created by huliang on 3/28/17.
  */
 public class ListTweetLikeUsersFragment extends BaseRecyclerViewFragment<TweetLike>
@@ -44,17 +44,12 @@ public class ListTweetLikeUsersFragment extends BaseRecyclerViewFragment<TweetLi
 //        mOperator = (TweetDetailContract.Operator) context;
     }
 
-    @Override
-    protected BaseRecyclerAdapter<TweetLike> getRecyclerAdapter() {
-        return new TweetLikeUsersAdapter(getContext());
-    }
-
     /**
      * 加载网络数据, 实际填充界面由 TweetLikeUsersAdapter 完成
      */
     @Override
     protected void requestData() {
-        // 刷新则 token 为空, 继续加载则使用上个翻页的 pageToken
+        // 刷新则 token 为空, 继续加载则使用上个页面的 pageToken
         String token = isRefreshing ? null : mBean.getNextPageToken();
         OSChinaApi.getTweetLikeList(mOperator.getTweetDetail().getId(), token, mHandler);
     }
@@ -66,6 +61,11 @@ public class ListTweetLikeUsersFragment extends BaseRecyclerViewFragment<TweetLi
         if (mAdapter.getCount() < 20 && mAgencyView != null) {
             mAgencyView.resetLikeCount(mAdapter.getCount());
         }
+    }
+
+    @Override
+    protected BaseRecyclerAdapter<TweetLike> getRecyclerAdapter() {
+        return new TweetLikeUsersAdapter(getContext());
     }
 
     /**

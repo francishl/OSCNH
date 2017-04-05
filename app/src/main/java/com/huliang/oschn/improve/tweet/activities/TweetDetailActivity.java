@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.gson.reflect.TypeToken;
@@ -19,8 +20,10 @@ import com.huliang.oschn.improve.base.activities.BaseActivity;
 import com.huliang.oschn.improve.bean.Tweet;
 import com.huliang.oschn.improve.bean.base.ResultBean;
 import com.huliang.oschn.improve.bean.simple.TweetComment;
+import com.huliang.oschn.improve.behavior.CommentBar;
 import com.huliang.oschn.improve.tweet.contract.TweetDetailContract;
 import com.huliang.oschn.improve.tweet.fragments.TweetDetailViewPagerFragment;
+import com.huliang.oschn.improve.widget.TweetPicturesLayout;
 import com.huliang.oschn.util.TLog;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -30,7 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * 动弹详情
- * <p>
+ * <p/>
  * Created by huliang on 3/28/17.
  */
 public class TweetDetailActivity extends BaseActivity implements TweetDetailContract.Operator {
@@ -48,6 +51,16 @@ public class TweetDetailActivity extends BaseActivity implements TweetDetailCont
     CoordinatorLayout mCoordinatorLayout;
     @Bind(R.id.toolbar)
     Toolbar mToolbar;
+    @Bind(R.id.tweet_pics_layout)
+    TweetPicturesLayout mLayoutGrid;
+    @Bind(R.id.tv_time)
+    TextView tvTime;
+    @Bind(R.id.tv_client)
+    TextView tvClient;
+    @Bind(R.id.iv_thumbup)
+    ImageView ivThumbup;
+
+    private CommentBar mDelegation;
 
     private Tweet tweet;
 
@@ -87,6 +100,9 @@ public class TweetDetailActivity extends BaseActivity implements TweetDetailCont
                 supportFinishAfterTransition();
             }
         });
+
+        // 将 CommentBar 添加到 mCoordinatorLayout 上
+        mDelegation = CommentBar.delegation(this, mCoordinatorLayout);
 
         // 使用传递过来的tweet填充数据
         setupDetailView();
@@ -137,6 +153,7 @@ public class TweetDetailActivity extends BaseActivity implements TweetDetailCont
             return;
         }
 
+        // portrait and nickname
         if (tweet.getAuthor() != null) {
             if (TextUtils.isEmpty(tweet.getAuthor().getPortrait())) {
                 ivPortrait.setImageResource(R.mipmap.widget_default_face);
@@ -152,8 +169,17 @@ public class TweetDetailActivity extends BaseActivity implements TweetDetailCont
             tvNick.setText(tweet.getAuthor().getName());
         }
 
+        // content
         if (!TextUtils.isEmpty(tweet.getContent())) {
             tvContent.setText(tweet.getContent());
+        }
+
+        // image grid
+        mLayoutGrid.setImages(tweet.getImages());
+
+        // time
+        if (!TextUtils.isEmpty(tweet.getPubDate())) {
+            tvTime.setText(tweet.getPubDate());
         }
     }
 
