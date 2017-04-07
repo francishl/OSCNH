@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 public final class AppOperator {
 
     private static ExecutorService EXECUTORS_INSTANCE;
+    private static Gson GSON_INSTANCE;
 
     /**
      * 获取线程池
@@ -65,5 +66,17 @@ public final class AppOperator {
         gsonBuilder.registerTypeAdapter(Tweet.Image.class, deserializer);
 
         return gsonBuilder.create();
+    }
+
+    /**
+     * 防止线程冲突
+     *
+     * @return
+     */
+    public synchronized static Gson getGson() {
+        if (GSON_INSTANCE == null) {
+            GSON_INSTANCE = createGson();
+        }
+        return GSON_INSTANCE;
     }
 }
