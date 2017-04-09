@@ -1,6 +1,10 @@
 package com.huliang.oschn.improve.widget;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -11,6 +15,7 @@ import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.huliang.oschn.R;
@@ -21,17 +26,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 动态栏目View 请通过{@link #setTabPickerManager(TabPickerDataManager)}来设置活动数据和原始数据，数据
- * 对象根据需要实现{@link Object#hashCode()}和{@link Object#equals(Object)}方法，因为非活动数据是通过使用
- * {@link List#contains(Object)}方法从原始数据剔除活动数据实现的。
- * <p>
- * <p>活动动态栏目的添加、删除、移动、选择通过{@link OnTabPickingListener}来实现的，你可以通过方法
+ * 动态 tab 选择器
+ * <p/>
+ * 请通过{@link #setTabPickerManager(TabPickerDataManager)}来设置 active 数据和原始数据,数据对象根据
+ * 需要实现{@link Object#hashCode()}和{@link Object#equals(Object)}方法,因为 inactive 数据是通过使用
+ * {@link List#contains(Object)}方法从原始数据剔除 active 数据实现的。
+ * <p/>
+ * 活动动态栏目的添加、删除、移动、选择通过{@link OnTabPickingListener}来实现的，你可以通过方法
  * {@link #setOnTabPickingListener(OnTabPickingListener)}来监听。
- * <p>
- * <p>通过{@link #show(int)}和{@link #hide()}方法来显示隐藏动态栏目界面。
- * <p>
- * <p>通过{@link #onTurnBack()}响应回退事件。
- * <p>
+ * <p/>
+ * 通过{@link #show(int)}和{@link #hide()}方法来显示隐藏动态栏目选择器界面。
+ * <p/>
+ * 通过{@link #onTurnBack()}响应回退事件。
+ * <p/>
  * Created by huliang on 4/6/17.
  */
 public class TabPickerView extends FrameLayout {
@@ -40,6 +47,8 @@ public class TabPickerView extends FrameLayout {
     private RecyclerView mRecyclerActive;
     private RecyclerView mRecyclerInactive;
     private LinearLayout mLayoutWrapper;
+    private NestedScrollView mViewScroller;
+    private RelativeLayout mLayoutTop;
 
     private Action1<ViewPropertyAnimator> mOnShowAnimator; // 显示监听器
     private Action1<ViewPropertyAnimator> mOnHideAnimator; // 隐藏监听器
@@ -79,7 +88,7 @@ public class TabPickerView extends FrameLayout {
         return mTabManager;
     }
 
-    public void setTabPickingListener(OnTabPickingListener mTabPickingListener) {
+    public void setOnTabPickingListener(OnTabPickingListener mTabPickingListener) {
         this.mTabPickingListener = mTabPickingListener;
     }
 
@@ -101,9 +110,9 @@ public class TabPickerView extends FrameLayout {
                 holder.mViewTab.setText(item.getName());
 
                 if (item.isFixed()) {
-                    holder.mViewTab.setActivated(true);
-                } else {
                     holder.mViewTab.setActivated(false);
+                } else {
+                    holder.mViewTab.setActivated(true);
                 }
 
                 if (mSelectedIndex == position) {
@@ -130,8 +139,10 @@ public class TabPickerView extends FrameLayout {
         mActiveAdapter.setOnClickItemListener(new Action1<Integer>() {
             @Override
             public void call(Integer position) {
+                int tempIndex = mSelectedIndex;
                 mSelectedIndex = position;
-                mActiveAdapter.notifyItemChanged(mSelectedIndex);
+                mActiveAdapter.notifyItemChanged(tempIndex); // 取消上一个tab的选中状态
+                mActiveAdapter.notifyItemChanged(mSelectedIndex); // 更新当前tab的选中状态
                 hide();
             }
         });
@@ -219,6 +230,8 @@ public class TabPickerView extends FrameLayout {
 
         mRecyclerActive = (RecyclerView) view.findViewById(R.id.view_recycler_active);
         mRecyclerInactive = (RecyclerView) view.findViewById(R.id.view_recycler_inactive);
+        mLayoutTop = (RelativeLayout) view.findViewById(R.id.layout_top);
+        mViewScroller = (NestedScrollView) view.findViewById(R.id.view_scroller);
         mLayoutWrapper = (LinearLayout) view.findViewById(R.id.layout_wrapper);
         mViewOperator = (TextView) view.findViewById(R.id.tv_operator);
         mViewDone = (TextView) view.findViewById(R.id.tv_done);
@@ -252,13 +265,42 @@ public class TabPickerView extends FrameLayout {
     public void show(int selectedIndex) {
         TLog.log("当前选择tab: " + selectedIndex);
 
+        int tempIndex = mSelectedIndex;
         mSelectedIndex = selectedIndex;
-        mActiveAdapter.notifyItemChanged(mSelectedIndex);
+        mActiveAdapter.notifyItemChanged(tempIndex); // 取消上一个tab的选中状态
+        mActiveAdapter.notifyItemChanged(mSelectedIndex); // 更新当前tab的选中状态
 
+        // imageButton 动画
         if (mOnShowAnimator != null) {
             mOnShowAnimator.call(null);
         }
         this.setVisibility(VISIBLE);
+
+        // 1. 透明度的起点
+        mLayoutTop.setAlpha(0);
+        // 2. 透明度的终点 alpha(1)
+        mLayoutTop.animate()
+                .alpha(1)
+                .setDuration(380)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                    }
+                });
+
+        // 1. top顶部所在坐标, 位移的起点
+        mViewScroller.setTranslationY(-mViewScroller.getHeight());
+        // 2. 位移至坐标 Y=0
+        mViewScroller.animate()
+                .translationY(0)
+                .setDuration(380)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                    }
+                });
     }
 
     /**
@@ -274,10 +316,35 @@ public class TabPickerView extends FrameLayout {
             mOnHideAnimator.call(null);
         }
 
-        this.setVisibility(GONE);
+        mLayoutTop.animate()
+                .alpha(0)
+                .setDuration(380)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        setVisibility(GONE); // 动画结束时, 移除该视图
+                    }
+                });
+
+        mViewScroller.animate()
+                .translationY(-mViewScroller.getHeight())
+                .setDuration(380);
     }
 
+    /**
+     * tabPicker 退出
+     *
+     * @return
+     */
     public boolean onTurnBack() {
+        // 1. 如果未编辑模式, 则退出编辑模式
+        if (mActiveAdapter.isEditMode()) {
+            mActiveAdapter.cancelEditMode();
+            return true;
+        }
+
+        // 2. 如果已经展示, 则隐藏
         if (this.getVisibility() == VISIBLE) {
             hide();
             return true;
@@ -431,6 +498,16 @@ public class TabPickerView extends FrameLayout {
 
                 mViewTab = (TextView) view.findViewById(R.id.tv_content);
                 mViewDel = (ImageView) view.findViewById(R.id.iv_delete);
+
+                // 不同状态对应不同颜色
+                // 状态前加负号, 表示状态为 false
+                ColorStateList colorStateList = new ColorStateList(
+                        new int[][]{
+                                new int[]{-android.R.attr.state_activated},
+                                new int[]{}},
+                        new int[]{0XFF24CF5F, 0XFF6A6A6A});
+                mViewTab.setTextColor(colorStateList);
+                mViewTab.setActivated(true);
 
                 mViewTab.setTag(this); // 将 viewHolder 作为此 tab 的 tag
                 mViewDel.setTag(this);

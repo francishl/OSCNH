@@ -7,6 +7,9 @@ import com.huliang.oschn.improve.base.activities.BaseActivity;
 import com.huliang.oschn.improve.main.nav.NavFragment;
 import com.huliang.oschn.improve.main.nav.NavigationButton;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by huliang on 17/3/17.
  */
@@ -14,6 +17,8 @@ public class MainActivity extends BaseActivity implements NavFragment.OnNavigati
     private static final String TAG = "MainActivity";
 
     private NavFragment mNavBar;
+
+    private List<TurnBackListener> mTurnBackListeners = new ArrayList<>();
 
     @Override
     protected int getContentView() {
@@ -38,5 +43,26 @@ public class MainActivity extends BaseActivity implements NavFragment.OnNavigati
     @Override
     public void onReselect(NavigationButton navigationButton) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        for (TurnBackListener listener : mTurnBackListeners) {
+            // 返回 true 则拦截动作不再往下传递
+            if (listener.onTurnBack()) {
+                return;
+            }
+        }
+    }
+
+    public void addOnTurnBackListeners(TurnBackListener mTurnBackListener) {
+        this.mTurnBackListeners.add(mTurnBackListener);
+    }
+
+    /**
+     * 返回按钮点击监听器
+     */
+    public interface TurnBackListener {
+        boolean onTurnBack(); // 返回 true 则拦截动作不再往下传递, 返回 false 则继续传递该操作给下面的监听者
     }
 }

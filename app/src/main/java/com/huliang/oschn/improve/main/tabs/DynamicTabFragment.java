@@ -2,7 +2,9 @@ package com.huliang.oschn.improve.main.tabs;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewPropertyAnimator;
@@ -15,6 +17,8 @@ import com.huliang.oschn.R;
 import com.huliang.oschn.improve.app.AppOperator;
 import com.huliang.oschn.improve.base.fragments.BaseTitleFragment;
 import com.huliang.oschn.improve.bean.SubTab;
+import com.huliang.oschn.improve.main.MainActivity;
+import com.huliang.oschn.improve.user.fragments.UserInfoFragment;
 import com.huliang.oschn.improve.widget.TabPickerView;
 import com.huliang.oschn.util.TLog;
 
@@ -30,7 +34,7 @@ import butterknife.OnClick;
 
 /**
  * 动态栏目Fragment
- * <p>
+ * <p/>
  * Created by huliang on 17/3/17.
  */
 public class DynamicTabFragment extends BaseTitleFragment {
@@ -44,12 +48,28 @@ public class DynamicTabFragment extends BaseTitleFragment {
     @Bind(R.id.view_tab_picker)
     TabPickerView mViewTabPicker;
 
-    List<SubTab> tabs;
     private static TabPickerView.TabPickerDataManager mTabPickerDataManager;
+    private MainActivity activity;
+    private android.support.v4.app.FragmentPagerAdapter mAdapter;
+    List<SubTab> tabs;
 
     @Override
     protected int getContentLayoutId() {
         return R.layout.fragment_dynamic_tab;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (MainActivity) context;
+        // activity 捕捉返回按钮动作, onTurnBack() 负责具体处理动作逻辑
+        activity.addOnTurnBackListeners(new MainActivity.TurnBackListener() {
+            @Override
+            public boolean onTurnBack() {
+                TLog.log("DynamicTabFragment 返回按钮");
+                return mViewTabPicker != null && mViewTabPicker.onTurnBack();
+            }
+        });
     }
 
     @Override
@@ -59,35 +79,58 @@ public class DynamicTabFragment extends BaseTitleFragment {
         mViewTabPicker.setTabPickerManager(initTabPickerManager());
         TLog.log("tabs 个数: " + mViewTabPicker.getTabPickerManager().getOriginalDataSet().size());
 
-        mViewTabPicker.setTabPickingListener(new TabPickerView.OnTabPickingListener() {
+        mViewTabPicker.setOnTabPickingListener(new TabPickerView.OnTabPickingListener() {
+            private boolean isChangeIndex = false;
+
             @Override
-            public void onSelected(int position) {
+            public void onSelected(final int position) {
                 TLog.log("onSelected " + position);
+                TLog.log("个数" + mLayoutTab.getTabCount());
+
+                // tabLayout数目发生变化后TabLayout位置出现偏移, 需要延迟设置才能起效？？？
+                // 可能原因: 界面刷新 loop
+//                new Handler().post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mLayoutTab.getTabAt(position).select();
+//                    }
+//                });
+
                 mLayoutTab.getTabAt(position).select();
             }
 
             @Override
             public void onRemove(int position, SubTab tab) {
-
+                isChangeIndex = true;
             }
 
             @Override
             public void onInsert(SubTab tab) {
                 TLog.log("onInsert " + tab.getName());
-
+                isChangeIndex = true;
             }
 
             @Override
             public void onMove(int op, int np) {
-
+                isChangeIndex = true;
             }
 
             @Override
             public void onRestore(List<SubTab> activeTabs) {
+                // 如果 tabs 未发生变化, 则不保存
+                if (!isChangeIndex) {
+                    return;
+                }
+                isChangeIndex = false;
+
                 // 更新当前 tabLayout
+                TLog.log("onRestore() 更新tabLayout, 当前个数: " + activeTabs.size());
                 tabs.clear();
                 tabs.addAll(activeTabs);
 
+                // 通知更新 viewPager
+                // 因为 tabLayout 已经与 viewPager 绑定, 因此 tabLayout 会同步自动更新
+                mAdapter.notifyDataSetChanged();
             }
         });
 
@@ -134,7 +177,26 @@ public class DynamicTabFragment extends BaseTitleFragment {
             mLayoutTab.addTab(mLayoutTab.newTab().setText(tab.getName())); // 创建 active tab
         }
 
+        mViewPager.setAdapter(mAdapter = new android.support.v4.app.FragmentPagerAdapter(
+                getChildFragmentManager()) {
+            @Override
+            public Fragment getItem(int position) {
+                return new UserInfoFragment();
+            }
+
+            @Override
+            public int getCount() {
+                return tabs.size();
+            }
+
+            @Override
+            public CharSequence getPageTitle(int position) {
+                return tabs.get(position).getName();
+            }
+        });
+
         mLayoutTab.setupWithViewPager(mViewPager);
+        mLayoutTab.setSmoothScrollingEnabled(true);
     }
 
     /**
