@@ -18,7 +18,7 @@ import com.huliang.oschn.improve.app.AppOperator;
 import com.huliang.oschn.improve.base.fragments.BaseTitleFragment;
 import com.huliang.oschn.improve.bean.SubTab;
 import com.huliang.oschn.improve.main.MainActivity;
-import com.huliang.oschn.improve.user.fragments.UserInfoFragment;
+import com.huliang.oschn.improve.main.subscription.SubscribeFragment;
 import com.huliang.oschn.improve.widget.TabPickerView;
 import com.huliang.oschn.util.TLog;
 
@@ -181,7 +181,7 @@ public class DynamicTabFragment extends BaseTitleFragment {
                 getChildFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                return new UserInfoFragment();
+                return new SubscribeFragment();
             }
 
             @Override

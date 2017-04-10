@@ -64,4 +64,10 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
+
+    <!-- 用户中心 -->
+    <style name="Account_Base.App.Theme.NoTitle" parent="Base.App.Theme.NoTitle">
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
 </resources>

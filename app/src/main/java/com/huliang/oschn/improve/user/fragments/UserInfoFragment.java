@@ -8,9 +8,11 @@ import android.widget.TextView;
 
 import com.huliang.oschn.R;
 import com.huliang.oschn.improve.account.AccountHelper;
+import com.huliang.oschn.improve.account.activity.LoginActivity;
 import com.huliang.oschn.improve.base.fragments.BaseFragment;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
@@ -57,6 +59,7 @@ public class UserInfoFragment extends BaseFragment {
     @Bind(R.id.user_info_notice_message)
     TextView mMesView;
 
+
     @Override
     protected int getLayoutId() {
         return R.layout.fragment_main_user_home;
@@ -98,4 +101,47 @@ public class UserInfoFragment extends BaseFragment {
         mLayAboutCount.setVisibility(View.GONE);
     }
 
+    @OnClick({R.id.user_view_solar_system, R.id.iv_logo_setting, R.id.iv_logo_zxing,
+            R.id.iv_portrait, R.id.ly_tweet, R.id.ly_favorite, R.id.ly_following, R.id.ly_follower,
+            R.id.rl_message, R.id.rl_blog, R.id.rl_info_question, R.id.rl_info_activities,
+            R.id.rl_team})
+    public void onClick(View view) {
+        int id = view.getId();
+
+        if (id == R.id.iv_logo_setting) {
+
+        } else {
+            if (!AccountHelper.isLogin()) {
+                LoginActivity.show(getActivity());
+                return;
+            }
+
+            switch (id) {
+                case R.id.user_view_solar_system:
+                    break;
+                case R.id.iv_logo_zxing:
+                    break;
+                case R.id.iv_portrait:
+                    break;
+                case R.id.ly_tweet:
+                    break;
+                case R.id.ly_favorite:
+                    break;
+                case R.id.ly_following:
+                    break;
+                case R.id.ly_follower:
+                    break;
+                case R.id.rl_message:
+                    break;
+                case R.id.rl_blog:
+                    break;
+                case R.id.rl_info_question:
+                    break;
+                case R.id.rl_info_activities:
+                    break;
+                case R.id.rl_team:
+                    break;
+            }
+        }
+    }
 }

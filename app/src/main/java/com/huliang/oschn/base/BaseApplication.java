@@ -24,8 +24,20 @@ public class BaseApplication extends Application {
         return (BaseApplication) _context;
     }
 
+    public static void showToastShort(int message) {
+        showToast(message, Toast.LENGTH_SHORT, 0);
+    }
+
     public static void showToastShort(String message) {
         showToast(message, Toast.LENGTH_SHORT, 0, Gravity.BOTTOM);
+    }
+
+    public static void showToast(int message, int duration, int icon) {
+        showToast(message, duration, icon, Gravity.BOTTOM);
+    }
+
+    public static void showToast(int message, int duration, int icon, int gravity) {
+        showToast(context().getString(message), duration, icon, gravity);
     }
 
     public static void showToast(String message, int duration, int icon, int gravity) {

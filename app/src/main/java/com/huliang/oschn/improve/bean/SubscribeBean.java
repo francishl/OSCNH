@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created by huliang on 4/5/17.
  */
-public class SubBean implements Serializable {
+public class SubscribeBean implements Serializable {
 
     private String cacheKey;
     private long id;

@@ -29,13 +29,22 @@
 
         <activity
             android:name=".improve.main.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/App.Theme.Main" />
 
-        <activity android:name=".improve.media.ImageGalleryActivity" />
+        <activity
+            android:name=".improve.media.ImageGalleryActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".improve.tweet.activities.TweetDetailActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Base.App.Theme.NoTitle" />
+
+        <activity
+            android:name=".improve.account.activity.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Account_Base.App.Theme.NoTitle" />
     </application>
 
 </manifest>
