@@ -4,6 +4,8 @@
     package="com.huliang.oschn">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:name=".OSCApplication"
@@ -45,6 +47,33 @@
             android:name=".improve.account.activity.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Account_Base.App.Theme.NoTitle" />
+
+        <activity
+            android:name="net.oschina.app.wxapi.WXEntryActivity"
+            android:exported="true" />
+
+        <!-- ############ QQ授权的Activity注册 start ############ -->
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent100942993" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="behind"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <!-- ############ QQ授权的Activity注册 end ############ -->
+
     </application>
 
 </manifest>

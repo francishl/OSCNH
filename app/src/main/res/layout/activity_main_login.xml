@@ -196,11 +196,12 @@
             android:layout_marginLeft="24dp"
             android:layout_marginRight="24dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/bg_login_submit"
+            android:background="@drawable/bg_login_submit_lock"
             android:elevation="0dp"
             android:text="@string/login"
-            android:textColor="@color/white"
+            android:textColor="@color/account_lock_font_color"
             android:textSize="@dimen/font_18"
+            android:translationZ="0dp"
             tools:targetApi="lollipop" />
 
         <Button
@@ -298,8 +299,12 @@
                     android:scaleType="centerInside"
                     android:src="@mipmap/ic_login_3party_qq" />
             </LinearLayout>
-
         </LinearLayout>
     </FrameLayout>
 
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 </FrameLayout>

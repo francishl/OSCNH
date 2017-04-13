@@ -48,6 +48,12 @@ public class ApiHttpClient {
         log("GET " + partUrl + "?" + params);
     }
 
+    public static void post(String partUrl, RequestParams params,
+                            AsyncHttpResponseHandler handler) {
+        CLIENT.post(getAbsoluteApiUrl(partUrl), params, handler);
+        log("GET " + partUrl + "?" + params);
+    }
+
     public static void setHttpClient(AsyncHttpClient c, Application application) {
         CLIENT = c;
         initSSL(CLIENT);

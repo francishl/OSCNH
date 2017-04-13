@@ -73,4 +73,37 @@ public class OSChinaApi {
         params.put("pageToken", pageToken);
         ApiHttpClient.get("action/apiv2/tweet_likes", params, handler);
     }
+
+    /**
+     * 用户登录
+     *
+     * @param username username
+     * @param pwd      pwd
+     * @param handler  handler
+     */
+    public static void login(String username, String pwd, TextHttpResponseHandler handler) {
+        RequestParams params = new RequestParams();
+        params.put("account", username);
+        params.put("password", pwd);
+        ApiHttpClient.post("action/apiv2/account_login", params, handler);
+    }
+
+    /**
+     * 用户登录: 获取授权
+     *
+     * @param clientId
+     * @param responseType
+     * @param redirectUri
+     * @param state
+     * @param handler
+     */
+    public static void loginAuthorize(String clientId, String responseType, String redirectUri,
+                                      String state, TextHttpResponseHandler handler) {
+        RequestParams params = new RequestParams();
+        params.put("client_id", clientId);
+        params.put("response_type", responseType);
+        params.put("redirect_uri", redirectUri);
+        params.put("state", state);
+        ApiHttpClient.get("action/oauth2/authorize", params, handler);
+    }
 }
